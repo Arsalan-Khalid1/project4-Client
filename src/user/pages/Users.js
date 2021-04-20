@@ -1,35 +1,47 @@
-import React from "react";
-
+import React, { useEffect, useState } from "react";
+import ErrorModal from "../../shared/components/UIElements/ErrorModal";
+import LoadingSpinner from "../../shared/components/UIElements/LoadingSpinner";
 import UsersList from "../components/UsersList";
 
 const Users = () => {
-  const USERS = [
-    {
-      id: "u1",
-      name: "Arslan Khalid",
-      image:
-        "https://scontent.flhe3-1.fna.fbcdn.net/v/t1.6435-9/120270313_1678786832325970_8139761353787146575_n.jpg?_nc_cat=100&ccb=1-3&_nc_sid=09cbfe&_nc_eui2=AeHEI2hQwNjMu7DCMryNTd5Nd7Ukq5Rsj1J3tSSrlGyPUgVk7mbR9JkS54Hf2O-J8pZTj-S1GraBz6K4IT-v7_XV&_nc_ohc=8WI16bhmwNAAX9cLmar&_nc_ht=scontent.flhe3-1.fna&oh=2bb920db3ebd366cd00ebab101ff2955&oe=60A07FE2",
-      places: 3,
-    },
-    {
-      id: "u2",
-      name: "Max Schwarz",
-      image:
-        "https://images.pexels.com/photos/839011/pexels-photo-839011.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=750&w=1260",
-      places: 3,
-    },
-  ];
-  // const USERS = [
-  //   {
-  //     id: "u1",
-  //     name: "Max Schwarz",
-  //     image:
-  //       "https://images.pexels.com/photos/839011/pexels-photo-839011.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=750&w=1260",
-  //     places: 3,
-  //   },
-  // ];
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState(false);
+  const [loadedUsers, setLoadedUsers] = useState();
 
-  return <UsersList items={USERS} />;
+  useEffect(() => {
+    const sendRequest = async () => {
+      setIsLoading(true);
+      try {
+        const response = await fetch("http://localhost:5000/api/users");
+        const responseData = await response.json();
+        if (!response.ok) {
+          throw new Error(responseData.message);
+        }
+        setLoadedUsers(responseData.users);
+        setIsLoading(false);
+      } catch (err) {
+        setError(err.message);
+      }
+      setIsLoading(false);
+    };
+    sendRequest();
+  }, []);
+
+  const errorHandler = () => {
+    setError(null);
+  };
+
+  return (
+    <React.Fragment>
+      <ErrorModal error={error} onClear={errorHandler} />
+      {isLoading && (
+        <div className="center">
+          <LoadingSpinner />
+        </div>
+      )}
+      {!isLoading && loadedUsers && <UsersList items={loadedUsers} />}
+    </React.Fragment>
+  );
 };
 
 export default Users;
