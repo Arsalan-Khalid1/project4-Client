@@ -15,6 +15,7 @@ const PlaceItem = (props) => {
   const auth = useContext(AuthContext);
   const [showMap, setShowMap] = useState(false);
   const [showConfirmModal, setShowConfirmModal] = useState(false);
+
   const openMapHandler = () => setShowMap(true);
 
   const closeMapHandler = () => setShowMap(false);
@@ -37,6 +38,7 @@ const PlaceItem = (props) => {
       props.onDelete(props.id);
     } catch (err) {}
   };
+
   return (
     <React.Fragment>
       <ErrorModal error={error} onClear={clearError} />
@@ -77,7 +79,10 @@ const PlaceItem = (props) => {
         <Card className="place-item__content">
           {isLoading && <LoadingSpinner asOverlay />}
           <div className="place-item__image">
-            <img src={props.image} alt={props.title} />
+            <img
+              src={`http://localhost:5000/${props.image}`}
+              alt={props.title}
+            />
           </div>
           <div className="place-item__info">
             <h2>{props.title}</h2>
